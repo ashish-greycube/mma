@@ -1,0 +1,36 @@
+<style>
+p {
+    font-size: 20px;
+    font-weight: bold;
+  }
+</style>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p><strong>Date:</strong> <u>{%= frappe.datetime.str_to_user(frappe.datetime.now_date())%} </u></p>
+<br>
+<p>The Director General <br> 
+Maurtis Revenue Authority <br>
+Ehram Court<br>
+Cnr Mgr Gonin & Sir V. Naz Strets</p>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p>Dear Sir,</p>
+<br>
+<br>
+
+<p>During the period <strong><u> {%= frappe.datetime.str_to_user(filters.from_date) %}</u> </strong>to <strong><u> {%= frappe.datetime.str_to_user(filters.to_date) %} </u> </strong> Cattle / Goals / Sheep / Pigs were slaughtered at the Central Abattoir on Account of Mr <u>{%= filters.customer %} </u></p>
+<br>
+<br>
+<br>
+<p><strong>Total No of Head:  <u>{%= data[0].TotalNoofHeads %} </u></strong></p>
+<p><strong>Total Carcass Weight (Kgs): <u>{%= data[0].TotalCarcassWeight %} </u></strong></p>
