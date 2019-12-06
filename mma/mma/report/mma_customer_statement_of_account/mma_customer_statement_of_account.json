@@ -1,0 +1,28 @@
+{
+ "add_total_row": 0,
+ "creation": "2019-12-06 14:18:35.293787",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2019-12-06 15:53:49.765440",
+ "modified_by": "Administrator",
+ "module": "MMA",
+ "name": "MMA Customer Statement of Account",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT \nposting_date,\nHD,\nOrigin,\nRate,\nKgs,\nAmountRs,\nmax(hdsum)as hdsum ,\nmax(totalweight) as totalweight,\nmax(invoicetotal) as invoicetotal,\nmax( outstandingbefore) as outstandingbefore,\nmax(finaloutstanding ) as finaloutstanding\nfrom\n(SELECT \nSI.posting_date,\nsum(SIT.no_of_heads_cf)as HD,\nSIT.origin_cf as Origin,\nSIT.rate_per_kg as Rate,\nsum(SIT.weight) AS Kgs,\nsum(SIT.amount) AS AmountRs,\n0 AS hdsum,\n0 AS totalweight,\n0 AS invoicetotal,\n0 AS outstandingbefore,\n0 AS finaloutstanding\nFROM `tabSales Invoice` SI\nINNER JOIN `tabSales Invoice Item` SIT \nON SI.name= SIT.parent\nwhere SI.docstatus = 1\nAND SI.customer = %(customer)s\nAND SI.posting_date >= %(from_date)s\nAND SI.posting_date <= %(to_date)s\nGROUP BY \nSI.posting_date,\nSIT.origin_cf,\nSIT.rate_per_kg,\nhdsum,\ntotalweight,\ninvoicetotal,\noutstandingbefore,\nfinaloutstanding\nUNION ALL\nSELECT \n0 AS posting_date,\n0 AS no_of_heads_cf,\n0 AS origin_cf,\n0 AS rate_per_kg,\n0 AS weight,\n0 AS amount,\nsum(SIT.no_of_heads_cf) AS hdsum,\n0 AS totalweight,\n0 AS invoicetotal,\n0 AS outstandingbefore,\n0 AS finaloutstanding\nFROM `tabSales Invoice` SI\nINNER JOIN `tabSales Invoice Item` SIT \nON SI.name= SIT.parent\nwhere SI.docstatus = 1\nAND SI.customer = %(customer)s\nAND SI.posting_date >= %(from_date)s\nAND SI.posting_date <= %(to_date)s\nUNION ALL\nSELECT \n0 AS posting_date,\n0 AS no_of_heads_cf,\n0 AS origin_cf,\n0 AS rate_per_kg,\n0 AS weight,\n0 AS amount,\n0 AS hdsum,\nsum(SIT.weight) AS totalweight,\n0 AS invoicetotal,\n0 AS outstandingbefore,\n0 AS finaloutstanding\nFROM `tabSales Invoice` SI\nINNER JOIN `tabSales Invoice Item` SIT \nON SI.name= SIT.parent\nwhere SI.docstatus = 1\nAND SI.customer = %(customer)s\nAND SI.posting_date >= %(from_date)s\nAND SI.posting_date <= %(to_date)s\nUNION ALL\nSELECT \n0 AS posting_date,\n0 AS no_of_heads_cf,\n0 AS origin_cf,\n0 AS rate_per_kg,\n0 AS weight,\n0 AS amount,\n0 AS hdsum,\n0 AS totalweight,\nSUM(net_total) AS invoicetotal,\n0 AS outstandingbefore,\n0 AS finaloutstanding\nFROM `tabSales Invoice` SI\nINNER JOIN `tabSales Invoice Item` SIT \nON SI.name= SIT.parent\nwhere SI.docstatus = 1\nAND SI.customer = %(customer)s\nAND SI.posting_date >= %(from_date)s\nAND SI.posting_date <= %(to_date)s\nUNION ALL\nSELECT \n0 AS posting_date,\n0 AS no_of_heads_cf,\n0 AS origin_cf,\n0 AS rate_per_kg,\n0 AS weight,\n0 AS amount,\n0 AS hdsum,\n0 AS totalweight,\n0 AS invoicetotal,\nSUM(outstanding_amount) AS outstandingbefore,\n0 AS finaloutstanding\nFROM `tabSales Invoice` SI\nINNER JOIN `tabSales Invoice Item` SIT \nON SI.name= SIT.parent\nwhere SI.docstatus = 1\nAND SI.customer = %(customer)s\nAND SI.posting_date < %(from_date)s\nAND SI.outstanding_amount > 0 \nUNION ALL\nSELECT \n0 AS posting_date,\n0 AS no_of_heads_cf,\n0 AS origin_cf,\n0 AS rate_per_kg,\n0 AS weight,\n0 AS amount,\n0 AS hdsum,\n0 AS totalweight,\n0 AS invoicetotal,\n0 AS outstandingbefore,\nSUM(outstanding_amount) AS finaloutstanding\nFROM `tabSales Invoice` SI\nINNER JOIN `tabSales Invoice Item` SIT \nON SI.name= SIT.parent\nwhere SI.docstatus = 1\nAND SI.customer = %(customer)s\nAND SI.outstanding_amount > 0 ) T\nGROUP BY \nposting_date,\nHD,\nOrigin,\nRate,\nKgs,\nAmountRs\n",
+ "ref_doctype": "Sales Invoice",
+ "report_name": "MMA Customer Statement of Account ",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Accounts User"
+  }
+ ]
+}

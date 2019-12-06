@@ -1,0 +1,62 @@
+<div style="text-align: center"><h2>Customer Statement of Account</h2></div>
+<p>Mauritius Meat Authority<br>
+    Roaches Bois <br>
+    <strong>From:</strong> Finance Depart.<br>
+    <strong>To:</strong> {%= filters.customer %}<br>
+    <strong>Date:</strong> {%= frappe.datetime.str_to_user(frappe.datetime.now_date())%} <br>
+    <strong>Invoice as at:</strong> {%= frappe.datetime.str_to_user(filters.to_date) %} <br>
+    </p>
+    
+    <br>
+    
+    <table class="table table-bordered "> 
+       <thead>
+		<tr>
+            <th>Date</th>
+            <th>HD</th>
+            <th>Origin</th>
+            <th>Rate</th>
+            <th>Kgs</th>
+            <th>Amount Rs</th>
+        </tr>
+       </thead>
+       <tbody>
+            {% for(var i=1, l=data.length-1; i<l; i++) { %}
+        <tr>
+            <td>{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
+            <td style="text-align: right;">{%= data[i].HD %}</td>
+            <td>{%= data[i].Origin %}</td>
+            <td style="text-align: right;">{%= data[i].Rate %}</td>
+            <td style="text-align: right;">{%= data[i].Kgs %}</td>
+            <td style="text-align: right;"> {%= data[i].AmountRs %}</td>
+        </tr>
+        {% } %}
+        <tr>
+                <td></td>
+                <td style="text-align: right;"><strong>{%= data[0].hdsum %}</strong></td>
+                <td></td>
+                <td style="text-align: right;"></td>
+                <td style="text-align: right;"><strong>{%= data[0].totalweight %}</strong></td>
+                <td style="text-align: right;"><strong>{%= data[0].invoicetotal %}</strong></td>
+            </tr>
+    </tbody>
+    <tr>
+            <td colspan="5">Invoice as at {%= frappe.datetime.str_to_user(filters.from_date) %}</td>
+            <td style="text-align: right;"><strong>{%= data[0].outstandingbefore %}</strong></td>
+     </tr>
+
+       
+        <tr>
+            <td colspan="5" rowspan="1"></td>
+            <td style="text-align: right;"><strong></strong></td>
+        </tr>
+        <tr>
+            <td colspan="5" rowspan="1"></td>
+            <td style="text-align: right;"><strong></strong></td>
+        </tr>
+        <tr>
+            <td colspan="5"></td>
+            <td style="text-align: right;"><strong>{%= data[0].finaloutstanding %}</strong></td>
+        </tr>
+    </table>
+    
