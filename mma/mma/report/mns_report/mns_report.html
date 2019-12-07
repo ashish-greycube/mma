@@ -1,0 +1,82 @@
+<div style="text-align: center"><h4>MNS LCSRTN V1.0</h4></div>
+
+<br>
+
+<table class="table table-bordered "> 
+	<tr>
+    	<td>
+        	<table> 
+            	<tr>
+                    <th>TAN Company</th>
+                    <td>20087842913</td>
+                </tr>
+                <tr>
+                    <th>BRN Company</th>
+                    <td>C070074751</td>
+                </tr>
+                <tr>
+                    <th>Name of the Company</th>
+                    <td>Mauritus Meat Authority</td>
+                </tr>
+                <tr>
+                    <th>Year ending 30 June</th>
+                    <td>{%= frappe.defaults.get_user_default("year_end_date").substring(0,4) %}</td>
+                </tr>
+        	</table>
+        </td>
+        <td>
+        	<table> 
+            	<tr>
+                    <th>Telephone</th>
+                    <td>20087842913</td>
+                </tr>
+                <tr>
+                    <th>Mobile number</th>
+                    <td>C070074751</td>
+                </tr>
+                <tr>
+                    <th>Name of Declarant</th>
+                    <td>Kartive</td>
+                </tr>
+                <tr>
+                    <th>Email Address</th>
+                    <td>kartive71@gmail.com</td>
+                </tr>
+        	</table>
+        </td>
+    </tr>
+</table>
+
+<table class="table table-bordered "> 
+    <thead>
+	<tr>
+		<th>Date of Invoice</th>
+		<th>Invoice Number</th>
+		<th>Suppliers</th>
+		<th>Supplier’s Business</th>
+		<th>Supplier’s National Identity Numer</th>
+		<th>Description of Goods/Services</th>
+        <th>Invoiced Amount exclusive of VAT (Rs)</th>
+        <th>Invoiced amount of VAT (Rs)</th>
+        <th>Paid amount</th>
+    </tr>
+    </thead>
+    <tbody>
+            {% for(var i=0, l=data.length-1; i<l; i++) { %}
+            <tr>
+            
+        <td>{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
+		<td>{%= data[i].invoice_number %}</td>
+		<td>{%= data[i].supplier %}</td>
+        <td>{%= data[i].brn %}</td>
+        <td></td>
+        <td>{%= data[i].item_name %}</td>
+		<td style="text-align: right;">{%= data[i].net_total %}</td>
+		<td style="text-align: right;">{%= data[i].grand_total %}</td>
+		<td style="text-align: right;">{%= data[i].paid_amount %}</td>
+    </tr>
+    {% } %}
+
+    </tbody>
+	
+</table>
