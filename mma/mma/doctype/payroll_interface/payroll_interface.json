@@ -145,7 +145,7 @@
    "label": "Accounting Entries",
    "oldfieldname": "entries",
    "oldfieldtype": "Table",
-   "options": "Journal Entry Account",
+   "options": "Payroll Interface Account",
    "reqd": 1
   },
   {
@@ -486,7 +486,7 @@
  "icon": "fa fa-file-text",
  "is_submittable": 1,
  "links": [],
- "modified": "2020-01-08 16:07:04.292826",
+ "modified": "2020-01-09 11:12:32.208379",
  "modified_by": "Administrator",
  "module": "MMA",
  "name": "Payroll Interface",

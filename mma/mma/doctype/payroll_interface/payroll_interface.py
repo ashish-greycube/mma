@@ -68,11 +68,23 @@ class PayrollInterface(AccountsController):
 
 	def make_journal_entry(self,source_name, target_doc=None, ignore_permissions=True):
 		def set_missing_values(source, target):
-			target.posting_date=nowdate()
+			target.posting_date=source.posting_date
+			target.cheque_no=source.cheque_no
+			target.cheque_date=source.cheque_date
+			target.user_remark=source.user_remark
+			target.total_amount=source.total_amount
+			target.total_amount_in_words=source.total_amount_in_words
+
+
 			target.flags.ignore_permissions = ignore_permissions
 			target.run_method("set_missing_values")
 		def update_item(source, target, source_parent):
-			pass
+			target.user_remark=source.user_remark
+			target.reference_type=source.reference_type
+			target.reference_name=source.reference_name
+			target.reference_due_date=source.reference_due_date
+			target.party_type=source.party_type
+
 		doclist = get_mapped_doc("Payroll Interface", source_name, {
 				"Payroll Interface": {
 					"doctype": "Journal Entry",
@@ -80,7 +92,7 @@ class PayrollInterface(AccountsController):
 						"docstatus": ["=", 1]
 					}
 				},
-				"Journal Entry Account": {
+				"Payroll Interface Account": {
 					"doctype": "Journal Entry Account",
 					"postprocess": update_item
 				},
@@ -121,7 +133,7 @@ class PayrollInterface(AccountsController):
 
 	def validate_inter_company_accounts(self):
 		if self.voucher_type == "Inter Company Journal Entry" and self.inter_company_journal_entry_reference:
-			doc = frappe.get_doc("Journal Entry", self.inter_company_journal_entry_reference)
+			doc = frappe.get_doc("Payroll Interface", self.inter_company_journal_entry_reference)
 			account_currency = frappe.get_cached_value('Company',  self.company,  "default_currency")
 			previous_account_currency = frappe.get_cached_value('Company',  doc.company,  "default_currency")
 			if account_currency == previous_account_currency:
@@ -130,7 +142,7 @@ class PayrollInterface(AccountsController):
 
 	def update_inter_company_jv(self):
 		if self.voucher_type == "Inter Company Journal Entry" and self.inter_company_journal_entry_reference:
-			frappe.db.set_value("Journal Entry", self.inter_company_journal_entry_reference,\
+			frappe.db.set_value("Payroll Interface", self.inter_company_journal_entry_reference,\
 				"inter_company_journal_entry_reference", self.name)
 
 	def update_invoice_discounting(self):
@@ -190,9 +202,9 @@ class PayrollInterface(AccountsController):
 
 	def unlink_inter_company_jv(self):
 		if self.voucher_type == "Inter Company Journal Entry" and self.inter_company_journal_entry_reference:
-			frappe.db.set_value("Journal Entry", self.inter_company_journal_entry_reference,\
+			frappe.db.set_value("Payroll Interface", self.inter_company_journal_entry_reference,\
 				"inter_company_journal_entry_reference", "")
-			frappe.db.set_value("Journal Entry", self.name,\
+			frappe.db.set_value("Payroll Interface", self.name,\
 				"inter_company_journal_entry_reference", "")
 
 	def unlink_asset_adjustment_entry(self):
@@ -225,7 +237,7 @@ class PayrollInterface(AccountsController):
 
 	def validate_entries_for_advance(self):
 		for d in self.get('accounts'):
-			if d.reference_type not in ("Sales Invoice", "Purchase Invoice", "Journal Entry"):
+			if d.reference_type not in ("Sales Invoice", "Purchase Invoice", "Payroll Interface"):
 				if (d.party_type == 'Customer' and flt(d.credit) > 0) or \
 						(d.party_type == 'Supplier' and flt(d.debit) > 0):
 					if d.is_advance=="No":
@@ -253,7 +265,7 @@ class PayrollInterface(AccountsController):
 				if d.reference_name == self.name:
 					frappe.throw(_("You can not enter current voucher in 'Against Journal Entry' column"))
 
-				against_entries = frappe.db.sql("""select * from `tabJournal Entry Account`
+				against_entries = frappe.db.sql("""select * from `tabPayroll Interface Account`
 					where account = %s and docstatus = 1 and parent = %s
 					and (reference_type is null or reference_type in ("", "Sales Order", "Purchase Order"))
 					""", (d.account, d.reference_name), as_dict=True)
@@ -659,7 +671,7 @@ class PayrollInterface(AccountsController):
 			if frappe.db.get_value("Stock Entry", self.stock_entry, "docstatus") != 1:
 				frappe.throw(_("Stock Entry {0} is not submitted").format(self.stock_entry))
 
-			if frappe.db.exists({"doctype": "Journal Entry", "stock_entry": self.stock_entry, "docstatus":1}):
+			if frappe.db.exists({"doctype": "Payroll Interface", "stock_entry": self.stock_entry, "docstatus":1}):
 				frappe.msgprint(_("Warning: Another {0} # {1} exists against stock entry {2}".format(self.voucher_type, self.name, self.stock_entry)))
 
 	def validate_empty_accounts_table(self):
@@ -801,7 +813,7 @@ def get_payment_entry(ref_doc, args):
 			args.get("party_account"), args.get("party_account_currency"),
 			ref_doc.company, ref_doc.doctype, ref_doc.name)
 
-	je = frappe.new_doc("Journal Entry")
+	je = frappe.new_doc("Payroll Interface")
 	je.update({
 		"voucher_type": "Bank Entry",
 		"company": ref_doc.company,
@@ -873,7 +885,7 @@ def get_opening_accounts(company):
 
 def get_against_jv(doctype, txt, searchfield, start, page_len, filters):
 	return frappe.db.sql("""select jv.name, jv.posting_date, jv.user_remark
-		from `tabJournal Entry` jv, `tabJournal Entry Account` jv_detail
+		from `tabPayroll Interface` jv, `tabPayroll Interface Account` jv_detail
 		where jv_detail.parent = jv.name and jv_detail.account = %s and ifnull(jv_detail.party, '') = %s
 		and (jv_detail.reference_type is null or jv_detail.reference_type = '')
 		and jv.docstatus = 1 and jv.`{0}` like %s order by jv.name desc limit %s, %s""".format(searchfield),
@@ -890,12 +902,12 @@ def get_outstanding(args):
 
 	company_currency = erpnext.get_company_currency(args.get("company"))
 
-	if args.get("doctype") == "Journal Entry":
+	if args.get("doctype") == "Payroll Interface":
 		condition = " and party=%(party)s" if args.get("party") else ""
 
 		against_jv_amount = frappe.db.sql("""
 			select sum(debit_in_account_currency) - sum(credit_in_account_currency)
-			from `tabJournal Entry Account` where parent=%(docname)s and account=%(account)s {0}
+			from `tabPayroll Interface Account` where parent=%(docname)s and account=%(account)s {0}
 			and (reference_type is null or reference_type = '')""".format(condition), args)
 
 		against_jv_amount = flt(against_jv_amount[0][0]) if against_jv_amount else 0
@@ -1025,7 +1037,7 @@ def get_average_exchange_rate(account):
 
 @frappe.whitelist()
 def make_inter_company_journal_entry(name, voucher_type, company):
-	journal_entry = frappe.new_doc('Journal Entry')
+	journal_entry = frappe.new_doc('Payroll Interface')
 	journal_entry.voucher_type = voucher_type
 	journal_entry.company = company
 	journal_entry.posting_date = nowdate()
