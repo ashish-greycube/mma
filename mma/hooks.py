@@ -57,6 +57,10 @@ app_license = "MIT"
 # before_install = "mma.install.before_install"
 # after_install = "mma.install.after_install"
 
+# Fixtures
+# ----------
+fixtures = ['Workflow', 'Workflow State', 'Workflow Action']
+
 # Desk Notifications
 # ------------------
 # See frappe.core.notifications.get_notification_config
