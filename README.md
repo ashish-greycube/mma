@@ -4,9 +4,13 @@ Customization for Mauritius Meat Authority
 
 ### Payroll Interface
 
-To port data from Payroll System (3rd Party) to Journal Entry via Staging Doctype Payroll Interface
+Data pushed from Payroll System (3rd Party) to Journal Entry via Staging Doctype Payroll Interface
 
 From Payroll Interface the data is validated and pushed to JE (Draft)
+
+Workflow is set on Payroll Interface Pending > Approve / Reject
+
+On Approve the Payroll Interface will be submitted and the JE (draft) created
 
 ### Reports
 
